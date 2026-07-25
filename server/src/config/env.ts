@@ -11,8 +11,11 @@ for(const key of required){
     }
 }
 
-export const config = {
+export const env = {
   port: Number(process.env.PORT) || 4001,
 
   mongoUri: process.env.MONGO_URI!,
+
+  isProduction: process.env.NODE_ENV === 'production'!,
+  isDevelopment: process.env.NODE_ENV === 'development'!,
 }
