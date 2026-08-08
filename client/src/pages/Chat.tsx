@@ -7,7 +7,7 @@ import EmptyState from '../components/common/EmptyState.jsx';
 import StatusBadge from '../components/common/StatusBadge.jsx';
 import useDocuments from '../hooks/useDocuments.js';
 import useChat from '../hooks/useChat.js';
-import { useAppContext } from '../context/AppContext.jsx';
+import { useAppContext } from '../context/AppContext.js';
 import { STATUS } from '../constants/index.js';
 
 export default function Chat() {
