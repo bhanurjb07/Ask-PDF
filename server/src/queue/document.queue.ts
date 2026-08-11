@@ -1,4 +1,6 @@
 import { Queue } from 'bullmq';
+import { QUEUE_NAMES, JOB_NAMES } from '../constants';
+import { createBullmqConnection } from '../config/bullmqRedis';
 
 
 interface DocumentProcessingJobData {
@@ -8,10 +10,12 @@ interface DocumentProcessingJobData {
     createdAt?: string;
 }
 
-export const dDocumentQueue = new Queue<DocumentProcessingJobData>(
-    QUEUE_NAMES.DOCUMENT_PROCESSING,
-    {
-        connection: connection,
+//creates the connection to the queue's storage/server(redish)
+const connection = createBullmqConnection('BullMQ Queue');
+
+
+export const dDocumentQueue = new Queue<DocumentProcessingJobData>(QUEUE_NAMES.DOCUMENT_PROCESSING,{
+        connection,
 
         defaultJobOptions:{
             // Try each job up to 3 times if processing fails.

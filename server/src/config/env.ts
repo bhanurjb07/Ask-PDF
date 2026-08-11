@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const required = [
+  "PORT",
   "MONGO_URI",
   "REDIS_URL",
   "GEMINI_API_KEY",

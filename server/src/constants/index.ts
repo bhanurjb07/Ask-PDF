@@ -49,3 +49,11 @@ export const RETRIEVAL = {
   QUESTION_MAX_LENGTH: 2000,
   QUESTION_MIN_LENGTH: 3,
 };
+
+export const QUEUE_NAMES = {
+  DOCUMENT_PROCESSING: 'document-processing',
+};
+
+export const JOB_NAMES = {
+  PROCESS_DOCUMENT: 'process-document',
+};

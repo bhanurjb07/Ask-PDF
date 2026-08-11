@@ -48,8 +48,10 @@ const documentService={
     logger.info(`Upload started: ${sanitizeOriginalName(file.originalname)}`);
 
     try{
+        //check if file is pdf or not
         await assertPdfMagicBytes(absolutePath);
 
+        //document creation
         const document = await documentRepository.create({
             originalName: sanitizeOriginalName(file.originalname),
             storedName: file.filename,
@@ -63,8 +65,7 @@ const documentService={
         });
 
         let job;
-
-        try {
+        try{
             job = await addDocumentProcessingJob({
                 documentId: document._id,
                 filePath: document.filePath,
