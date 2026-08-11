@@ -1,6 +1,7 @@
 import { Queue } from 'bullmq';
 import { QUEUE_NAMES, JOB_NAMES } from '../constants';
 import { createBullmqConnection } from '../config/bullmqRedis';
+import logger from '../utils/logger';
 
 
 interface DocumentProcessingJobData {
@@ -14,7 +15,7 @@ interface DocumentProcessingJobData {
 const connection = createBullmqConnection('BullMQ Queue');
 
 
-export const dDocumentQueue = new Queue<DocumentProcessingJobData>(QUEUE_NAMES.DOCUMENT_PROCESSING,{
+export const documentQueue = new Queue<DocumentProcessingJobData>(QUEUE_NAMES.DOCUMENT_PROCESSING,{
         connection,
 
         defaultJobOptions:{
@@ -44,24 +45,18 @@ export const dDocumentQueue = new Queue<DocumentProcessingJobData>(QUEUE_NAMES.D
     },
 );
 
-
-interface DocumentProcessingJobData {
-    documentId: string;
-    filePath: string;
-    storedName: string;
-    createdAt?: string;
-}
-
+//add a document-processing job to the queue
 export const addDocumentProcessingJob = async({
     documentId,
     filePath,
     storedName,
     createdAt = new Date().toISOString(),
 }: DocumentProcessingJobData) =>{
-    const job = await documentQueue.add(
+    //puttting a job into the queue
+    const job = await documentQueue.add(                 ///queue.add(name, data, opts?)       
         JOB_NAMES.PROCESS_DOCUMENT,
         {
-            documentId: String(documentId),
+            documentId,
             filePath,
             storedName,
             createdAt,
@@ -71,9 +66,14 @@ export const addDocumentProcessingJob = async({
         },
     );
 
-    logger.info(
-        `Job Added: id=${job.id} documentId=${documentId}`,
-    );
+    logger.info(`Job Added: id=${job.id} documentId=${documentId}`);
 
     return job;
+};
+
+//shut down the queue promperly
+export const closeDocumentQueue =async ()=>{
+    await documentQueue.close();
+    await connection.quit();
+    logger.info('Document processing queue closed');
 };

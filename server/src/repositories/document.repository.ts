@@ -10,6 +10,13 @@ const documentRepository={
         return Document.findById(id).exec();
     },
 
+    updateById(id: string, payload:any){
+        return Document.findByIdAndUpdate(id, payload, {
+            new: true,
+            runValidators: true,
+        }).exec();
+    },
+
 };
 
 export default documentRepository;

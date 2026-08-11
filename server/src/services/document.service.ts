@@ -43,6 +43,7 @@ const documentService={
         );
     }
 
+    //absolute path of file
     const absolutePath= file.path || path.join(UPLOADS_DIR, file.filename);
 
     logger.info(`Upload started: ${sanitizeOriginalName(file.originalname)}`);
@@ -67,22 +68,23 @@ const documentService={
         let job;
         try{
             job = await addDocumentProcessingJob({
-                documentId: document._id,
+                documentId: String(document._id),
                 filePath: document.filePath,
                 storedName: document.storedName,
                 createdAt: new Date().toISOString(),
             });
-        } catch (queueError: unknown) {
-            await documentRepository.updateById(document._id, {
+
+        }catch(queueError: unknown){
+            await documentRepository.updateById(String(document._id), {
                 status: DOCUMENT_STATUS.FAILED,
                 failureReason: 'Failed to enqueue processing job',
             });
 
-            if (queueError instanceof Error) {
+            if(queueError instanceof Error){
                 logger.error(
                     `Queue enqueue failed: ${queueError.message}`,
                 );
-            } else {
+            }else{
                 logger.error('Queue enqueue failed');
             }
 

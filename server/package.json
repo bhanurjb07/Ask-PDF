@@ -16,7 +16,9 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.6.0",
     "mongoose": "^9.8.0",
-    "redis": "^6.1.0"
+    "redis": "^6.1.0",
+    "bullmq": "^6.0.9",
+    "ioredis": "^6.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
