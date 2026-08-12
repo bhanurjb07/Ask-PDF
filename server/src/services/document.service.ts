@@ -38,7 +38,7 @@ const cleanupUploadedFile =async(absolutePath: string) =>{
 };
 
 const documentService={
-  async upload(file: any, createdBy: string | null = null) {
+  async upload(file: UploadFile | undefined, createdBy: string | null = null){
     if(!file){
         throw new ApiError(
             HTTP_STATUS.BAD_REQUEST,
