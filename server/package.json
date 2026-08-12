@@ -11,18 +11,21 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
+    "bullmq": "^6.0.9",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.6.0",
+    "ioredis": "^6.0.0",
     "mongoose": "^9.8.0",
+    "multer": "^2.2.0",
     "redis": "^6.1.0",
-    "bullmq": "^6.0.9",
-    "ioredis": "^6.0.0"
+    "uuid": "^14.0.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/multer": "^2.2.0",
     "@types/node": "^26.1.1",
     "rimraf": "^6.x",
     "tsx": "^4.x",
