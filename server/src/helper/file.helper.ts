@@ -71,3 +71,42 @@ export const sanitizeOriginalName = (name: string = ''): string => {
 
     return base.trim() || 'document.pdf';
 };
+
+//Converts a DB document into API object.
+export const toPublicDocument=(document: any)=>{
+    if(!document)return null;
+
+    //if documnet is object than fine else create object
+    const doc= typeof document.toObject === 'function' ? document.toObject() : {...document};
+
+    return {
+        id: doc._id,
+        originalName: doc.originalName,
+        storedName: doc.storedName,
+        mimeType: doc.mimeType,
+        fileSize: doc.fileSize,
+        status: doc.status,
+        pageCount: doc.pageCount,
+        wordCount: doc.wordCount,
+        characterCount: doc.characterCount,
+        averageWordsPerPage: doc.averageWordsPerPage,
+        chunkCount: doc.chunkCount || 0,
+        embeddedChunkCount: doc.embeddedChunkCount || 0,
+        embeddingProgressPercentage:
+            (doc.chunkCount || 0) === 0 ? 0
+               : Number((((doc.embeddedChunkCount || 0) / doc.chunkCount) * 100).toFixed(2)),
+        embeddingStatus: doc.status,
+        pdfMetadata: doc.pdfMetadata || null,
+        processingStartedAt: doc.processingStartedAt,
+        processingCompletedAt: doc.processingCompletedAt,
+        processingDuration: doc.processingDuration,
+        failureReason: doc.failureReason,
+        uploadedAt: doc.uploadedAt,
+        createdBy: doc.createdBy,
+        createdAt: doc.createdAt,
+        updatedAt: doc.updatedAt,
+        hasText: Boolean(doc.rawText) || (doc.characterCount || 0) > 0,
+    };
+};
+
+//

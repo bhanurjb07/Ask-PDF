@@ -5,7 +5,10 @@ import ApiResponse from '../utils/ApiResponse.js';
 import documentRepository from "../repositories/document.repository.js";
 import { HTTP_STATUS, DOCUMENT_STATUS } from "../constants/index.js";
 import { addDocumentProcessingJob } from "../queue/document.queue.js";
-import { deleteLocalFile, assertPdfMagicBytes, sanitizeOriginalName, UPLOADS_DIR } from "../helper/file.helper.js";
+import cacheService from "./cache.service.js";
+import { paginateText } from "../helper/text.helper.js";
+import { deleteLocalFile, assertPdfMagicBytes, 
+    sanitizeOriginalName, UPLOADS_DIR, toPublicDocument } from "../helper/file.helper.js";
 
 interface UploadFile {
   originalname: string;
@@ -96,9 +99,7 @@ const documentService={
 
         await cacheService.del(cacheService.listKey());
 
-        logger.success(
-            `Upload queued: documentId=${document._id} jobId=${job.id}`,
-        );
+        logger.success(`Upload queued: documentId=${document._id} jobId=${job.id}`);
 
         return {
             documentId: document._id,
@@ -136,10 +137,100 @@ const documentService={
             throw error;
         }
 
-        throw new ApiError(
-            HTTP_STATUS.INTERNAL_SERVER_ERROR,
-            'Failed to upload document',
-        );
+        throw new ApiError(HTTP_STATUS.INTERNAL_SERVER_ERROR,'Failed to upload document');
     }
   },
+
+  //check redis for data if not found then query database
+  async getAll(){
+    const cacheKey= cacheService.listKey();
+    const cached= await cacheService.get(cacheKey);
+
+    if(cached){
+        return cached;
+    }
+
+    //query DB
+    const document= await documentRepository.findAll();
+    const payload= document.map(toPublicDocument);
+    //putting data in redis
+    await cacheService.set(cacheKey, payload, 30);     
+    return payload;
+  },
+
+  
+  //getting a single document from redis/DB
+  async getById(id: string){
+    const cacheKey = cacheService.documentKey(id);
+    const cached = await cacheService.get(cacheKey);
+    if(cached){
+        return cached;
+    }
+
+    const document = await documentRepository.findById(id);
+    if(!document){
+        throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Document not found');
+    }
+
+    const payload = toPublicDocument(document);
+    await cacheService.set(cacheKey, payload, 30);
+    return payload;
+  },
+
+
+  //get document processing status with redis caching
+  async getStatus(id: string){
+    const cacheKey = cacheService.statusKey(id);
+    const cached = await cacheService.get(cacheKey);
+    if(cached){
+        return cached;
+    }
+
+    const document = await documentRepository.findById(id);
+    if(!document){
+        throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Document not found');
+    }
+
+    const payload = {
+        status: document.status,
+        failureReason: document.failureReason,
+        chunkCount: document.chunkCount || 0,
+        embeddedChunkCount: document.embeddedChunkCount || 0,
+        progressPercentage: (document.chunkCount || 0) === 0 ? 0
+                : Number((
+                    ((document.embeddedChunkCount || 0) / document.chunkCount) * 100
+                  ).toFixed(2)
+        )
+    };
+    await cacheService.set(cacheKey, payload, 5);
+    return payload;
+
+  },
+
+
+  //get extracted text for a documen
+  async getText(id: string, { limit, offset }: { limit?: number; offset?: number }={}){
+    const document = await documentRepository.findByIdWithText(id);
+    
+    if(!document){
+        throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Document not found');
+    }
+
+    if(!document.rawText){
+        throw new ApiError(HTTP_STATUS.BAD_REQUEST,
+          'Extracted text is not available yet for this document',
+        );
+    }
+
+    const page= paginateText(document.rawText, limit, offset);
+    return{
+        documentId: document._id,
+        status: document.status,
+        ...page,
+    };
+  },
+
+
 }
+
+export default documentService;

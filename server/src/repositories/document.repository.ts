@@ -1,5 +1,8 @@
 import Document from "../models/Document.model";
 
+interface FindAllOptions{
+    limit?: number;
+}
 
 const documentRepository={
     create(payload: any){
@@ -15,6 +18,19 @@ const documentRepository={
             new: true,
             runValidators: true,
         }).exec();
+    },
+
+    findAll(filter = {}, options: FindAllOptions = {}) {
+        const query = Document.find(filter).sort({ uploadedAt: -1 });
+
+        if(options.limit) {
+            query.limit(options.limit);
+        }
+        return query.exec();
+    },
+
+    findByIdWithText(id: string){
+        return Document.findById(id).select('+rawText').exec();
     },
 
 };
