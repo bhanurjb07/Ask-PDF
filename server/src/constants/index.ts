@@ -43,6 +43,24 @@ export const EMBEDDING = {
   QUERY_TASK_TYPE: 'RETRIEVAL_QUERY',
 };
 
+//RAG chat defaults
+export const CHAT = {
+  MODEL: 'gemini-flash-latest',
+  MAX_CONTEXT_TOKENS: 8000,
+  MAX_CHAT_TOKENS: 2048,
+  STREAM_TIMEOUT_MS: 60000,
+  TEMPERATURE: 0.2,
+  TOP_P: 0.9,
+  MAX_RETRIES: 2,
+  RETRY_BASE_DELAY_MS: 1000,
+  NO_CONTEXT_MESSAGE:
+    "I couldn't find relevant information in the uploaded document.",
+  NO_ANSWER_MESSAGE:
+    "I couldn't find that information in the uploaded document.",
+  QUOTA_MESSAGE:
+    'Gemini API quota exceeded for the configured chat model. Wait for the quota window to reset, switch GEMINI_CHAT_MODEL, or enable billing on your Google AI Studio project.',
+};
+
 export const RETRIEVAL = {
   SIMILARITY_THRESHOLD: 0.55,
   TOP_K_RESULTS: 5,

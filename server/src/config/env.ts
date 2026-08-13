@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
+import { CHAT, EMBEDDING, RETRIEVAL } from '../constants/index.js';
 
 const required = [
   "PORT",
@@ -23,6 +24,8 @@ export const env = {
   redisUrl: process.env.REDIS_URL!,
   
   geminiApi: process.env.GEMINI_API_KEY!,
+  geminiChatModel: CHAT.MODEL!,
+  geminiEmbeddingModel: EMBEDDING.MODEL!,
 
   maxFileSize: process.env.MAX_FILE_SIZE!,
 
