@@ -1,7 +1,7 @@
 import { Queue } from 'bullmq';
-import { QUEUE_NAMES, JOB_NAMES } from '../constants';
-import { createBullmqConnection } from '../config/bullmqRedis';
-import logger from '../utils/logger';
+import { QUEUE_NAMES, JOB_NAMES } from '../constants/index.js';
+import { createBullmqConnection } from '../config/bullmqRedis.js';
+import logger from '../utils/logger.js';
 
 
 interface DocumentProcessingJobData {

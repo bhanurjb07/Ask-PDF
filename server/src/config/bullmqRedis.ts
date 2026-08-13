@@ -1,6 +1,7 @@
-import {env} from './env';
-import logger from '../utils/logger';
-import Redis from 'ioredis';
+import {env} from './env.js';
+import logger from '../utils/logger.js';
+import {Redis} from 'ioredis';
+import type { Redis as RedisType } from 'ioredis';
 
 //object containing configuration for the Redis connection
 export const bullmqRedisOptions={
@@ -23,7 +24,7 @@ export const bullmqRedisOptions={
 
 //logging redish connection
 let sharedConnection: any=null;
-export const attachListeners =(client: Redis, label = 'BullMQ Redis')=>{
+export const attachListeners=(client: RedisType, label = 'BullMQ Redis')=>{
 
   client.on('connect', ()=>{
     logger.info(`${label} connecting...`);
