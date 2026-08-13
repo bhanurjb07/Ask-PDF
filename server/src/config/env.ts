@@ -31,6 +31,8 @@ export const env = {
 
   corsOrigin: process.env.CORS_ORIGIN!,
 
+  nodeEnv: process.env.NODE_ENV || 'development',
+
   isProduction: process.env.NODE_ENV === 'production'!,
   isDevelopment: process.env.NODE_ENV === 'development'!,
 }
