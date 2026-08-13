@@ -11,6 +11,7 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "bullmq": "^6.0.9",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -19,6 +20,8 @@
     "ioredis": "^6.0.0",
     "mongoose": "^9.8.0",
     "multer": "^2.2.0",
+    "pdf-parse": "^2.4.5",
+    "pdf-parser": "^1.0.5",
     "redis": "^6.1.0",
     "uuid": "^14.0.1"
   },

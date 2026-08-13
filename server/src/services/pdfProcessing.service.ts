@@ -1,6 +1,6 @@
-import documentRepository from "../repositories/document.repository";
-import { DOCUMENT_STATUS } from "../constants/index";
-import workerLogger from "../utils/workerLogger";
+import documentRepository from '../repositories/document.repository.js'
+import { DOCUMENT_STATUS } from '../constants/index.js';
+import workerLogger from '../utils/workerLogger.js';
 
 
 
@@ -73,3 +73,5 @@ const pdfProcessingService={
 
     }
 }
+
+export default pdfProcessingService;
