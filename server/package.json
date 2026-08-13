@@ -13,12 +13,16 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "bullmq": "^6.0.9",
+    "compression": "^1.7.5",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.6.0",
+    "helmet": "^8.0.0",
     "ioredis": "^6.0.0",
     "mongoose": "^9.8.0",
+    "morgan": "^1.10.0",
     "multer": "^2.2.0",
     "pdf-parse": "^2.4.5",
     "pdf-parser": "^1.0.5",
@@ -26,8 +30,11 @@
     "uuid": "^14.0.1"
   },
   "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/morgan": "^1.9.10",
     "@types/multer": "^2.2.0",
     "@types/node": "^26.1.1",
     "rimraf": "^6.x",

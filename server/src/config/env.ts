@@ -29,6 +29,8 @@ export const env = {
 
   maxFileSize: process.env.MAX_FILE_SIZE!,
 
+  corsOrigin: process.env.CORS_ORIGIN!,
+
   isProduction: process.env.NODE_ENV === 'production'!,
   isDevelopment: process.env.NODE_ENV === 'development'!,
 }
