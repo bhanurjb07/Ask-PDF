@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type{ Request, Response } from 'express';
 import chatService from '../services/chat.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import ApiResponse from '../utils/ApiResponse.js';
@@ -14,7 +14,7 @@ const chatController = {
 
   // Get chat history for a document.
   getHistory: asyncHandler(async (req: Request, res: Response) => {
-    const history = await chatService.getHistory(req.params.documentId, {
+    const history = await chatService.getHistory(String(req.params.documentId), {
       page: req.query.page,
       limit: req.query.limit,
     });

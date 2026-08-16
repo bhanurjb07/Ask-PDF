@@ -1,4 +1,4 @@
-import Document from "../models/Document.model";
+import Document from '../models/Document.model.js';
 
 interface FindAllOptions{
     limit?: number;

@@ -1,6 +1,6 @@
 import createApp from "./app.js";
 import { connectDB } from "./config/db.js";
-import { env } from "./config/env.js";
+import { env } from '../src/config/env.js';
 import logger from "./utils/logger.js";
 import { initGemini } from './config/gemini.js';
 import connectRedis, { disconnectRedis } from './config/redis.js';

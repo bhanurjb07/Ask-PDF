@@ -1,5 +1,5 @@
 import logger from '../utils/logger.js';
-import { getRedisClient, getRedisStatus } from "../config/redis";
+import { getRedisClient, getRedisStatus } from '../config/redis.js';
 
 
 const DEFAULT_TTL_SECONDS=30;        //time to live
