@@ -45,8 +45,8 @@ export const sanitizeUserQuestion = (question = '') => {
  */
 interface Chunk{
     chunkIndex: number,
-    pageStart: number,
-    pageEnd: number,
+    pageStart: number | null,
+    pageEnd: number | null,
     similarity: number,
     text: string,
 }
@@ -54,7 +54,7 @@ export const truncateContextChunks = (
   chunks: Chunk[],
   maxTokens = CHAT.MAX_CONTEXT_TOKENS,
 ) => {
-  const selected = [];
+  const selected : Chunk[]= [];
   let used = 0;
 
   for (const chunk of chunks) {

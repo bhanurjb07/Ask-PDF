@@ -10,9 +10,9 @@ import logger from '../utils/logger.js';
 type ScoredChunk = {
   chunkIndex: number;
   similarity: number;
-  pageStart?: number | null;
-  pageEnd?: number | null;
-  wordCount?: number;
+  pageStart: number | null;
+  pageEnd: number | null;
+  wordCount: number| null;
   text: string;
 };
 
@@ -163,12 +163,13 @@ const retrievalService ={
         scored.push({
           chunkIndex: chunk.chunkIndex,
           similarity: Number(similarity.toFixed(6)),
-          pageStart: chunk.pageStart,
-          pageEnd: chunk.pageEnd,
-          wordCount: chunk.wordCount,
+          pageStart: chunk.pageStart ?? null,
+          pageEnd: chunk.pageEnd ?? null,
+          wordCount: chunk.wordCount ?? null,
           text: chunk.chunkText,
         });
-      } catch (error: unknown) {
+        
+      }catch (error: unknown) {
         const message =
           error instanceof Error ? error.message : String(error);
 
