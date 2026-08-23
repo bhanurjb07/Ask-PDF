@@ -1,8 +1,10 @@
 import documentRepository from '../repositories/document.repository.js'
 import { DOCUMENT_STATUS } from '../constants/index.js';
 import workerLogger from '../utils/workerLogger.js';
-
-
+import embeddingService from './embedding.service.js';
+import { parsePdfFile } from '../utils/pdfParser.js';
+import chunkService from './chunk.service.js';
+import logger from '../utils/logger.js';
 
 interface ProcessDocumentParams{
   documentId: string;
@@ -68,8 +70,85 @@ const pdfProcessingService={
             workerLogger.info({documentId,jobId, status: DOCUMENT_STATUS.PROCESSING,
                     message: `PDF Loaded path validated for ${storedName}`});
 
+            const parsed = await parsePdfFile(filePath);
+
+            await documentRepository.updateById(documentId, {
+              rawText: parsed.rawText,
+              pageCount: parsed.pageCount,
+              wordCount: parsed.wordCount,
+              characterCount: parsed.characterCount,
+              averageWordsPerPage: parsed.averageWordsPerPage,
+              pdfMetadata: parsed.metadata,
+              status: DOCUMENT_STATUS.TEXT_EXTRACTED,
+            });
+
+            workerLogger.info({documentId,jobId, status: DOCUMENT_STATUS.TEXT_EXTRACTED,
+              message: 'Mongo Updated (TEXT_EXTRACTED)',
+            });
+
+            const chunkResult = await chunkService.chunkDocument({documentId,
+              rawText: parsed.rawText,
+              pageCount: parsed.pageCount,
+              jobId
+            });
+
+            const embedResult = await embeddingService.embedDocument({documentId,jobId});
+            const processingCompletedAt = new Date();
+            const processingDuration = Date.now() - startedAt;
+
+            await documentRepository.updateById(documentId, {
+              status: DOCUMENT_STATUS.COMPLETED,
+              processingCompletedAt,
+              processingDuration,
+              failureReason: null,
+              embeddedChunkCount: embedResult.embedded,
+            });
+
+            workerLogger.success({documentId, jobId,
+              status: DOCUMENT_STATUS.COMPLETED,
+              executionTimeMs: processingDuration,
+              message: `Worker Completed chunks=${chunkResult.chunkCount} embedded=${embedResult.embedded}`,
+            });
+
+            return {
+              documentId,
+              status: DOCUMENT_STATUS.COMPLETED,
+              pageCount: parsed.pageCount,
+              wordCount: parsed.wordCount,
+              chunkCount: chunkResult.chunkCount,
+              embeddedChunkCount: embedResult.embedded,
+              executionTimeMs: processingDuration,
+            };
                     
-        }catch(error){}
+        }catch(error:unknown){
+          const err =error instanceof Error ? error : new Error(String(error));
+          const reason = failureMessageFromCode((error as { code:any}).code,
+            err.message
+          );
+
+          const processingCompletedAt = new Date();
+          const processingDuration = Date.now() - startedAt;
+
+          logger.error(`PDF processing failed documentId=${documentId}: ${reason}\n${err.stack || ''}`);
+
+          workerLogger.error({
+            documentId,
+            jobId,
+            status: DOCUMENT_STATUS.FAILED,
+            executionTimeMs: processingDuration,
+          });
+
+            // Keep chunks on embedding failures so retries can skip already-embedded chunks.
+            // Chunk service already cleans partial inserts if chunking itself fails.
+
+          await documentRepository.updateById(documentId, {
+            status: DOCUMENT_STATUS.FAILED,
+            failureReason: reason,
+            processingCompletedAt,
+            processingDuration,
+          });
+
+        }
 
     }
 }

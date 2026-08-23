@@ -39,8 +39,6 @@ const createApp =()=>{
 
   app.use('/', routes);
   app.use('/api', routes);
-  app.use(notFound);
-  app.use(errorHandler);
 
   app.use(notFound);
   app.use(errorHandler);

@@ -5,6 +5,7 @@ import logger from "./utils/logger.js";
 import { initGemini } from './config/gemini.js';
 import connectRedis, { disconnectRedis } from './config/redis.js';
 import { disconnectBullmqRedis } from './config/bullmqRedis.js';
+import {startDocumentWorker,stopDocumentWorker} from './workers/document.worker.js';
 
 let server = null;
 //Server start
@@ -15,6 +16,8 @@ const startServer=async()=>{
     await connectDB();
     await connectRedis();
     initGemini();
+
+    startDocumentWorker();
 
     const app=createApp();
 
