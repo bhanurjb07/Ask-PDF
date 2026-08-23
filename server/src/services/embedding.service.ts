@@ -1,5 +1,5 @@
 import {getEmbeddingModelName,getGeminiEmbeddingModel,initGemini} from '../config/gemini.js';
-import type { TaskType } from '@google/generative-ai';
+import { TaskType } from '@google/generative-ai';
 import chunkRepository from '../repositories/chunk.repository.js';
 import documentRepository from '../repositories/document.repository.js';
 import { DOCUMENT_STATUS, EMBEDDING, HTTP_STATUS } from '../constants/index.js';
@@ -70,7 +70,7 @@ const embeddingService = {
   // Generate an embedding for a single text.
   async generateEmbedding(
     text: string,
-    { taskType = EMBEDDING.TASK_TYPE }: { taskType?: TaskType } = {},
+    { taskType }: { taskType?: TaskType } = {},
   ) {
     if (!text || !String(text).trim()) {
       const error = new Error('Cannot embed empty chunk text') as Error & {
@@ -102,9 +102,18 @@ const embeddingService = {
   async generateBatchEmbeddings(
     texts: string[],
     { attempt = 1 }: { attempt?: number } = {},
-  ) {
-    if (!Array.isArray(texts) || texts.length === 0) {
-      return [];
+  ): Promise<{
+   embeddings: number[][];
+   apiTimeMs: number;
+   dimensions: number;
+  }> {
+
+    if(!Array.isArray(texts) || texts.length === 0){
+      return {
+        embeddings: [],
+        apiTimeMs: 0,
+        dimensions: 0,
+      };
     }
 
     if (texts.some((t) => !t || !String(t).trim())) {
@@ -117,13 +126,18 @@ const embeddingService = {
 
     initGemini();
     const model = getGeminiEmbeddingModel();
+    if(!model){
+      throw new ApiError(HTTP_STATUS.SERVICE_UNAVAILABLE,
+        'Gemini embedding model is not initialized',
+      );
+    }
     const apiStarted = Date.now();
 
     try {
       const result = await model.batchEmbedContents({
         requests: texts.map((text) => ({
-          content: { parts: [{ text: String(text) }] },
-          taskType: EMBEDDING.TASK_TYPE,
+          content: {role: 'user', parts: [{ text: String(text) }]},
+          taskType: TaskType.RETRIEVAL_DOCUMENT,
         })),
       });
 

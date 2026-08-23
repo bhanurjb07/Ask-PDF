@@ -6,6 +6,7 @@ import { cosineSimilarity } from '../utils/vector.utils.js';
 import {DOCUMENT_STATUS,EMBEDDING,HTTP_STATUS,RETRIEVAL,}from '../constants/index.js';
 import ApiError from '../utils/ApiError.js';
 import logger from '../utils/logger.js';
+import { TaskType } from '@google/generative-ai';
 
 type ScoredChunk = {
   chunkIndex: number;
@@ -35,7 +36,7 @@ type RetrieveRelevantChunksOptions = {
 const retrievalService ={
   async generateQuestionEmbedding(question: string): Promise<number[]>{
     return embeddingService.generateEmbedding(question, {
-      taskType: EMBEDDING.QUERY_TASK_TYPE,
+      taskType: TaskType.RETRIEVAL_QUERY,
     });
   },
 
@@ -168,7 +169,7 @@ const retrievalService ={
           wordCount: chunk.wordCount ?? null,
           text: chunk.chunkText,
         });
-        
+
       }catch (error: unknown) {
         const message =
           error instanceof Error ? error.message : String(error);
