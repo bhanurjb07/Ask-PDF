@@ -1,6 +1,6 @@
 import rateLimit from 'express-rate-limit';
-import { env } from '../config/env';
-import { HTTP_STATUS } from "../constants";
+import { env } from '../config/env.js';
+import { HTTP_STATUS } from '../constants/index.js';
 
 const rateLimiter = rateLimit({
   windowMs: 15*60*1000,    ///15 minutes

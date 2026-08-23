@@ -1,5 +1,5 @@
-import ApiError from "../utils/ApiError";
-import { HTTP_STATUS } from "../constants";
+import ApiError from "../utils/ApiError.js";
+import { HTTP_STATUS } from '../constants/index.js';
 import type { Request, Response, NextFunction }from 'express';
 
 //Catch-all middleware for unmatched routes.

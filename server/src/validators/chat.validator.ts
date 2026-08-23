@@ -49,7 +49,7 @@ export const validateDocumentIdParam = (
   _res: Response,
   next: NextFunction,
 ) => {
-  const { documentId } = req.params;
+  const documentId = String(req.params.documentId);
 
   if (!mongoose.Types.ObjectId.isValid(documentId)) {
     next(new ApiError(HTTP_STATUS.BAD_REQUEST, 'Invalid document id'));

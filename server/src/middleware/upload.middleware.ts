@@ -1,13 +1,13 @@
 import fs from 'fs';
-import { env } from '../config/env';
+import { env } from '../config/env.js';
 import path from 'path';
 import multer from 'multer';
 import { Request,Response , ErrorRequestHandler} from 'express';
 import {v4 as uuidv4 } from 'uuid';
-import { UPLOADS_DIR, sanitizeOriginalName } from '../helper/file.helper';
-import ApiError from '../utils/ApiError';
+import { UPLOADS_DIR, sanitizeOriginalName } from '../helper/file.helper.js';
+import ApiError from '../utils/ApiError.js';
 import type { FileFilterCallback } from 'multer';
-import { HTTP_STATUS } from '../constants/index';
+import { HTTP_STATUS } from '../constants/index.js';
 
 //creting folder
 if(!fs.existsSync(UPLOADS_DIR)){

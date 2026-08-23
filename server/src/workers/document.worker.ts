@@ -24,6 +24,10 @@ export const startDocumentWorker = () =>{
     async (job) => {
       const { documentId, filePath, storedName } = job.data;
 
+      if (!job.id){
+        throw new Error(`Document processing job is missing an id. documentId=${documentId}`);
+      }
+
       return pdfProcessingService.processDocument({
         documentId,
         filePath,

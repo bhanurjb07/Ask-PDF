@@ -1,4 +1,5 @@
 import {getEmbeddingModelName,getGeminiEmbeddingModel,initGemini} from '../config/gemini.js';
+import type { TaskType } from '@google/generative-ai';
 import chunkRepository from '../repositories/chunk.repository.js';
 import documentRepository from '../repositories/document.repository.js';
 import { DOCUMENT_STATUS, EMBEDDING, HTTP_STATUS } from '../constants/index.js';
@@ -69,7 +70,7 @@ const embeddingService = {
   // Generate an embedding for a single text.
   async generateEmbedding(
     text: string,
-    { taskType = EMBEDDING.TASK_TYPE }: { taskType?: string } = {},
+    { taskType = EMBEDDING.TASK_TYPE }: { taskType?: TaskType } = {},
   ) {
     if (!text || !String(text).trim()) {
       const error = new Error('Cannot embed empty chunk text') as Error & {
@@ -81,11 +82,16 @@ const embeddingService = {
 
     initGemini();
     const model = getGeminiEmbeddingModel();
+    if(!model){
+       throw new ApiError(HTTP_STATUS.SERVICE_UNAVAILABLE,
+        'Gemini embedding model is not initialized',
+      );
+    }
 
-    const result = await model.embedContent({
-      content: { parts: [{ text: String(text) }] },
-      taskType,
-    });
+    const result = await model.embedContent(
+      {content: {role: 'user',parts: [{ text: String(text) }]},
+      taskType}
+    );
 
     const values = result?.embedding?.values;
     this.validateEmbedding(values);
