@@ -5,10 +5,10 @@ import chatRepository from '../repositories/chat.repository.js';
 import {getChatModelName,getGeminiChatModel,initGemini} from '../config/gemini.js';
 import { buildRagPrompt } from '../prompts/rag.prompt.js';
 import { initSse, sendSseEvent, closeSse } from './streaming.service.js';
-import { CHAT, HTTP_STATUS } from '../constants/index.js';
 import env from '../config/env.js';
 import ApiError from '../utils/ApiError.js';
 import logger from '../utils/logger.js';
+import { CHAT, HTTP_STATUS, RETRIEVAL  } from '../constants/index.js';
 
 // Wait before retrying a Gemini request.
 const sleep = (ms: number) =>
@@ -113,8 +113,8 @@ const chatService = {
       const retrieval = await retrievalService.retrieveRelevantChunks({
         documentId,
         question: cleanQuestion,
-        topK: env.topKResults,
-        threshold: env.similarityThreshold,
+        topK: RETRIEVAL.TOP_K_RESULTS,
+        threshold: RETRIEVAL.SIMILARITY_THRESHOLD,
       });
 
       logger.info(
@@ -168,7 +168,15 @@ const chatService = {
       initGemini();
       const model = getGeminiChatModel();
 
-      logger.info(`Gemini request started documentId=${documentId}`);
+      if(!model){
+        throw new ApiError(HTTP_STATUS.INTERNAL_SERVER_ERROR,
+          'Gemini chat model is not initialized',
+        );
+      }
+
+logger.info(`Gemini request started documentId=${documentId}`);
+
+
       sendSseEvent(res, 'status', { stage: 'streaming_started' });
 
       let answer = '';
@@ -325,8 +333,8 @@ const chatService = {
         tokenUsage: item.tokenUsage,
         model: item.model,
         usedGemini: item.usedGemini,
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt,
+        // createdAt: item.createdAt,
+        // updatedAt: item.updatedAt,
       })),
     };
   },

@@ -166,7 +166,7 @@ export const splitIntoChunks = (
     if (currentWordCount > 0 && currentWordCount + unitWords > chunkSize) {
       flush();
 
-      // Overlap: keep last N words from previous chunk as the next start.
+      //Overlap: keep last N words from previous chunk as the next start.
       const prev = chunks[chunks.length - 1];
       const prevWords = wordsOf(prev.chunkText);
       const overlapWordsList = prevWords.slice(-overlap);

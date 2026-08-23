@@ -47,8 +47,8 @@ const documentController={
     //get document text 
     getDocumentText: asyncHandler(async (req:Request, res:Response) =>{ 
     const text = await documentService.getText(String(req.params.id), { 
-        limit: req.query.limit, 
-        offset: req.query.offset, 
+        limit: req.query.limit ? Number(req.query.limit) : undefined, 
+        offset: req.query.offset ? Number(req.query.limit) : undefined, 
     }); 
  
     res.status(HTTP_STATUS.OK).json(new ApiResponse( 

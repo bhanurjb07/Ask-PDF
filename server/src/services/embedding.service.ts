@@ -299,7 +299,7 @@ const embeddingService = {
     };
   },
 
-  // Get embedding progress for a document.
+  // Get embedding progress for a document. 
   async getEmbeddingStatus(documentId: string) {
     const document = await documentRepository.findById(documentId);
 

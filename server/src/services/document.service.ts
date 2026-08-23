@@ -208,7 +208,7 @@ const documentService={
   },
 
 
-  //get extracted text for a documen
+  //get extracted text for a documen 
   async getText(id: string, { limit, offset }: { limit?: number; offset?: number }={}){
     const document = await documentRepository.findByIdWithText(id);
     

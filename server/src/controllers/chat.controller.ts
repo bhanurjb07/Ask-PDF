@@ -15,8 +15,8 @@ const chatController = {
   // Get chat history for a document.
   getHistory: asyncHandler(async (req: Request, res: Response) => {
     const history = await chatService.getHistory(String(req.params.documentId), {
-      page: req.query.page,
-      limit: req.query.limit,
+      page: req.query.page ? Number(req.query.limit) : undefined,
+      limit: req.query.limit ? Number(req.query.limit) : undefined,
     });
 
     res
@@ -26,7 +26,7 @@ const chatController = {
 
   // Delete chat history for a document.
   deleteHistory: asyncHandler(async (req: Request, res: Response) => {
-    const result = await chatService.deleteHistory(req.params.documentId);
+    const result = await chatService.deleteHistory(String(req.params.documentId));
 
     res
       .status(HTTP_STATUS.OK)
