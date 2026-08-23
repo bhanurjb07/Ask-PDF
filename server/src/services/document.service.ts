@@ -3,12 +3,14 @@ import path from 'path';
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from '../utils/ApiResponse.js';
 import documentRepository from "../repositories/document.repository.js";
+import chatRepository from '../repositories/chat.repository.js';
 import { HTTP_STATUS, DOCUMENT_STATUS } from "../constants/index.js";
 import { addDocumentProcessingJob } from "../queue/document.queue.js";
 import cacheService from "./cache.service.js";
+import embeddingService from './embedding.service.js';
+import chunkService from '../services/chunk.service.js';
 import { paginateText } from "../helper/text.helper.js";
-import { deleteLocalFile, assertPdfMagicBytes, 
-    sanitizeOriginalName, UPLOADS_DIR, toPublicDocument } from "../helper/file.helper.js";
+import { deleteLocalFile, assertPdfMagicBytes, sanitizeOriginalName, UPLOADS_DIR, toPublicDocument } from "../helper/file.helper.js";
 
 interface UploadFile {
   originalname: string;
@@ -227,6 +229,43 @@ const documentService={
         documentId: document._id,
         status: document.status,
         ...page,
+    };
+  },
+
+  async getEmbeddingStatus(id: string){
+    return embeddingService.getEmbeddingStatus(id);
+  },
+
+  async getChunks(id: string,{ page, limit }:{ page?:number; limit?: number}={},){
+    return chunkService.getChunksByDocument(id, { page, limit });
+  },
+
+  async remove(id: string) {
+
+    const document = await documentRepository.findById(id);
+    if(!document){
+      throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Document not found');
+    }
+
+    await cacheService.invalidateDocument(id);
+
+    const chunkCleanup = await chunkService.deleteChunksForDocument(id);
+    const chatCleanup = await chatRepository.deleteByDocumentId(id);
+    
+    await documentRepository.deleteById(id);
+    const deletedFromDisk = await deleteLocalFile(document.filePath);
+    if (!deletedFromDisk) {
+      logger.warn(`Document record deleted but local file missing: ${document.storedName}`);
+    }
+    logger.success(
+      `Delete completed: ${document.storedName} chunksRemoved=${chunkCleanup.deletedCount}`,
+    );
+    return {
+      id: document._id,
+      deleted: true,
+      fileRemoved: deletedFromDisk,
+      chunksRemoved: chunkCleanup.deletedCount,
+      chatsRemoved: chatCleanup.deletedCount || 0,
     };
   },
 

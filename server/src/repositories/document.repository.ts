@@ -33,6 +33,16 @@ const documentRepository={
         return Document.findById(id).select('+rawText').exec();
     },
 
+    updateStatus(id: string, status:any) {
+        return Document.findByIdAndUpdate(id,{ status },
+           { new: true, runValidators: true },
+           ).exec();
+    },
+
+    deleteById(id: string){
+        return Document.findByIdAndDelete(id).exec();
+    },
+
 };
 
 export default documentRepository;
