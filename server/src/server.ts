@@ -12,6 +12,7 @@ let server = null;
 const startServer=async()=>{
   try{
     logger.info(`Starting server in ${env.nodeEnv} mode`);
+    logger.info(`Health check: http://localhost:${env.port}/health`);
 
     await connectDB();
     await connectRedis();
